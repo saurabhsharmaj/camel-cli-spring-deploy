@@ -1,8 +1,19 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
-rmdir /s /q .camel-jbang-run
-camel kubernetes run src\main\java\com\example\camel_code\* src\main\java\com\example\camel_code\utils\* ^
+rmdir /s /q .camel-jbang-run 2>nul
+
+set "JAVA_FILES="
+
+for /r "src\main\java" %%F in (*.java) do (
+    set "JAVA_FILES=!JAVA_FILES! "%%F""
+)
+
+echo Java files:
+echo !JAVA_FILES!
+echo.
+
+camel kubernetes run !JAVA_FILES! ^
     --cluster-type=kubernetes ^
     --name=apachemcamel ^
     --image-group=camel-poc ^
@@ -10,3 +21,5 @@ camel kubernetes run src\main\java\com\example\camel_code\* src\main\java\com\ex
     --trait container.image-pull-policy=Always ^
     --trait container.port=8080 ^
     --verbose
+
+endlocal
